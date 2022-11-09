@@ -8,6 +8,9 @@ root.configure(bg="white")
 root.geometry("1000x680")
 root.resizable(width=0, height=0)
 
+def raise_frame(frame):
+    frame.tkraise()
+
 def show_datos_basicos_entry():
     pass
 
@@ -20,7 +23,7 @@ def show_listado_proveedores():
     containerlist.configure(bg="white")
     containerlist.grid(column=0, row=0, sticky=('NWE'))    
 
-    title_proveedores_lista = tk.Label(proveedores_lista, text="LISTADO DE PROVEEDORES", font="Segoe 14 bold"  )
+    title_proveedores_lista = tk.Label(proveedores_lista, text="LISTADO DE PROVEEDORES", font="Segoe 18 bold" ).grid(column=0, row=0, sticky=('W','E'))
 
 def show_reporte():
     reporte = tk.Toplevel(root)
@@ -151,44 +154,46 @@ def calcular(*args):
     except:
         show_error_message()
 
-# frame que contendra el titulo y datos basicos sobre la obra y usuario
-headerframe = tk.Frame(root, padx="100", pady="20", bg="white", height=100)
-headerframe.grid(column=0, row=0, sticky=('NWE'))
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+def volver_al_menu():
+    raise_frame(f2)
 
-maintitle = tk.Label(headerframe, text="PRESUPUESTO DE OBRA", font="Segoe 18 bold")
-maintitle.grid(column=2, row=1, sticky=('W', 'E'))
+def volver_agregar_proveedor():
+    raise_frame(f1)
 
-text_indicacion = tk.Label(headerframe, text="Bienvenido usuario, completa el nombre de proveedor y los costos para agregar el elemento a la lista de proveedores.", pady=10)
-# text_indicacion.place(x=4, y=4)
-text_indicacion.grid(column=0, row=2, sticky=('W'), columnspan=6)
+def mostrar_mejor_opcion():
+    pass
 
-label_nombreproveedor = tk.Label(headerframe, text="Nombre del proveedor: ", padx=20).grid(column=1, row=3, sticky=('W'))
+# Frame 1 para la ventana de nombre proveedor, tabla de costos y botones
+f1 = tk.Frame(root)
+f1.grid(column=0, row=0, sticky='NEW')
+f1.configure(bg="white")
+headerframe = tk.Frame(f1, padx="100", pady="20", bg="white", height=160)
+headerframe.grid(column=0, row=0, sticky=('NEW'))
+
+maintitle = tk.Label(headerframe, text="PRESUPUESTO DE OBRA", font="Segoe 18 bold", bg="white")
+maintitle.place(x=240,y=10)
+# boton de volver al menu
+button_volver_menu = tk.Button(headerframe, text="Volver al menu", fg="white", bg="#434343", activebackground="#646464", activeforeground="white", command=volver_al_menu, cursor="hand2")
+button_volver_menu.place(x=-60, y=10)
+
+text_indicacion = tk.Label(headerframe, text="Bienvenido usuario, completa el nombre de proveedor y los costos para agregar el elemento a la lista de proveedores.", font="Segoe 10", pady=10, bg="white")
+text_indicacion.place(x=20,y=54)
+
+label_nombreproveedor = tk.Label(headerframe, text="Nombre del proveedor: ", padx=20, bg="white")
+label_nombreproveedor.place(x=100,y=110)
 nombreproveedor = tk.StringVar()
-entry_nombreproveedor = tk.Entry(headerframe, width=40, textvariable=nombreproveedor).grid(column=2, row=3, sticky=('W'))
-
-# label_nombreusuario = tk.Label(headerframe, text="Nombre del usuario", padx=20).grid(column=1, row=2, sticky=('W'))
-# nombreusuario = tk.StringVar()
-# entry_nombreusuario = tk.Entry(headerframe, width=40, textvariable=nombreusuario).grid(column=2, row=2, sticky=('W'))
-
-# label_nombreobra = tk.Label(headerframe, text="Nombre de la obra", padx=20).grid(column=1, row=3, sticky=('W'))
-# nombreobra = tk.StringVar()
-# entry_nombreobra = tk.Entry(headerframe, width=40, textvariable=nombreobra).grid(column=2, row=3, sticky=('W'))
-
-# label_descripcion = tk.Label(headerframe, text="Descripcion", padx=20).grid(column=1, row=4, sticky=('W'))
-# descripcion = tk.StringVar()
-# entry_descripcion = tk.Entry(headerframe, width=40, textvariable=descripcion).grid(column=2, row=4, sticky=('W'))
+entry_nombreproveedor = tk.Entry(headerframe, width=40, textvariable=nombreproveedor)
+entry_nombreproveedor.place(x=300,y=110)
 
 # padding para todos los elementos  del headerframe
-for child in headerframe.winfo_children():
-    child.grid_configure(pady=2)
-    child.configure(bg="white")
+# for child in headerframe.winfo_children():
+#     child.grid_configure(pady=2)
+    # child.configure(bg="white")
 
-maintitle.grid(pady=10)
+# maintitle.grid(pady=10)
 
 # frame que contendra la tabla
-contentframe = tk.Frame(root, padx="80", bg="white")
+contentframe = tk.Frame(f1, padx="80", bg="white")
 contentframe.grid(column=0, row=1, sticky=('NWE'), pady=30)
 # nombre de las columnas de la tabla
 label_fases = tk.Label(contentframe, text="FASES", font="Segoe 10 bold", fg="#243c5c", padx=20).grid(column=0, row=0, sticky=('W', 'E'))
@@ -320,7 +325,7 @@ subtotal_fase_3 = tk.Label(contentframe, text="0.00", width=5 )
 subtotal_fase_3.grid(column=6, row=9, sticky=('W', 'E'))
 # 6. Total general
 texto_total = tk.Label(contentframe, text="Total", width=5, font="Segoe 10 bold").grid(column=5, row=10, sticky=('W', 'E'))
-total = tk.Label(contentframe, text="00.00", width=5, background="yellow", font="Segoe 10 bold")
+total = tk.Label(contentframe, text="00.00", width=5, background="#F2F2F2", font="Segoe 10 bold")
 total.grid(column=6, row=10, sticky=('W', 'E'))
 
 # configurar padding y color del fondo
@@ -329,10 +334,70 @@ for child in contentframe.winfo_children():
     child.configure(bg="white")
 
 # frame que contendra los botones
-buttonsframe = tk.Frame(root, padx="100", pady="20", bg="white")
+buttonsframe = tk.Frame(f1, padx="100", pady="20", bg="white")
 buttonsframe.grid(column=0, row=2, sticky=('NWE'))
-button_calcular = tk.Button(buttonsframe, text="Calcular", width=24, bg="#2d78d6", fg="white", activebackground="#1f5aa2", activeforeground="white", command=calcular).grid(column=0, row=0, sticky=('E'), pady=4, padx=(620,0))
-button_agregar_a_lista = tk.Button(buttonsframe, text="Agregar a lista", width=24, bg="#FF4E4E", fg="white", activebackground="#D34444", activeforeground="white", command=show_reporte).grid(column=0, row=1, sticky=('W', 'E'), pady=4, padx=(620,0) )
-button_limpiar = tk.Button(buttonsframe, text="Limpiar", width=24, bg="#3091e2", fg="white", activebackground="#1f5aa2", activeforeground="white", command=limpiar_campos_entradas).grid(column=0, row=2, sticky=('W', 'E'), pady=4, padx=(620,0) )
+button_calcular = tk.Button(buttonsframe, text="Calcular", width=24, bg="#2d78d6", fg="white", activebackground="#1f5aa2", activeforeground="white", command=calcular, cursor="hand2").grid(column=0, row=0, sticky=('E'), pady=4, padx=(620,0))
+button_agregar_a_lista = tk.Button(buttonsframe, text="Agregar a lista", width=24, bg="#FF4E4E", fg="white", activebackground="#D34444", activeforeground="white", command=show_reporte, cursor="hand2").grid(column=0, row=1, sticky=('W', 'E'), pady=4, padx=(620,0) )
+button_limpiar = tk.Button(buttonsframe, text="Limpiar", width=24, bg="#3091e2", fg="white", activebackground="#1f5aa2", activeforeground="white", command=limpiar_campos_entradas, cursor="hand2").grid(column=0, row=2, sticky=('W', 'E'), pady=4, padx=(620,0) )
 
+
+# ------------------------- FRAME 2 --------------------------------
+# Frame 2 para listado de proveedores, datos basicos de la obra y el usuario
+f2 = tk.Frame(root)
+f2.grid(column=0, row=0, sticky='NEW')
+f2.configure(bg="white")
+headerframe2 = tk.Frame(f2, padx='100', pady="10", bg="white", height=70, width=1000)
+headerframe2.grid(column=0, row=0, sticky="NEW")
+title_frame2 = tk.Label(headerframe2, text="LISTADO DE PROVEEDORES", font="Segoe 18 bold", bg="white")
+title_frame2.place(x=220,y=10)
+formframe2 = tk.Frame(f2, padx="240", pady="10", bg="white", height=300, width=1000)
+formframe2.grid(column=0, row=1, sticky="NEW")
+
+label_nombreusuario = tk.Label(formframe2, text="Nombre del usuario", padx=20).grid(column=1, row=2, sticky=('W'))
+nombreusuario = tk.StringVar()
+entry_nombreusuario = tk.Entry(formframe2, width=40, textvariable=nombreusuario).grid(column=2, row=2, sticky=('W'))
+label_nombreobra = tk.Label(formframe2, text="Nombre de la obra", padx=20).grid(column=1, row=3, sticky=('W'))
+nombreobra = tk.StringVar()
+entry_nombreobra = tk.Entry(formframe2, width=40, textvariable=nombreobra).grid(column=2, row=3, sticky=('W'))
+label_descripcion = tk.Label(formframe2, text="Descripcion", padx=20).grid(column=1, row=4, sticky=('W'))
+descripcion = tk.StringVar()
+entry_descripcion = tk.Entry(formframe2, width=40, textvariable=descripcion).grid(column=2, row=4, sticky=('W'))
+
+for child in formframe2.winfo_children():
+    child.configure(bg="white")
+    child.grid_configure(pady="2")
+
+frame_lista_container = tk.Frame(f2, padx="10", pady="10", bg="#F2F2F2", height=420, width=1000)
+frame_lista_container.grid(column=0, row=2, sticky="WES")
+
+frame_lista_proveedores = tk.Frame(frame_lista_container, padx="180", pady="10", bg="#F2F2F2", height=420, width=1400)
+# frame_lista_proveedores.grid(column=0, row=0, sticky="WES", rowspan=1)
+frame_lista_proveedores.place(x=2,y=2)
+
+def spawn_item_proveedor(col, row):
+    item_proveedor = tk.Frame(frame_lista_proveedores, padx="2", pady="2", height=80, width=300, bg="white")
+    item_proveedor.grid(column=col, row=row, sticky="NEW", padx=8, pady=8)
+    texto_proveedor_n = tk.Label(item_proveedor, text="Proveedor 01", pady="4", font="Segoe 10 bold", bg="white")
+    texto_proveedor_n.place(x=6, y=5)
+    texto_prov_nombre = tk.Label(item_proveedor, text="Nombre:", pady="4", font="Segoe 10", fg="#0057C8", bg="white")
+    texto_prov_nombre.place(x=6, y=36)
+    texto_prov_nombre = tk.Label(item_proveedor, text="Constructora Las Casaruinas", pady="4", font="Segoe 10", fg="black", bg="white")
+    texto_prov_nombre.place(x=70, y=36)
+
+
+spawn_item_proveedor(0,0)
+spawn_item_proveedor(1,0)
+spawn_item_proveedor(0,1)
+spawn_item_proveedor(1,1)
+
+frame2_buttons = tk.Frame(f2, padx="200", pady="30", bg="white", height=60, width=1000)
+frame2_buttons.grid(column=0, row=3, sticky="WES")
+# boton de volver a agregar proveedor
+button_volver_agregar_prov = tk.Button(frame2_buttons, text="AGREGAR PRESUPUESTO", fg="white", bg="#FF4E4E", activebackground="#D34444", activeforeground="white", command=volver_agregar_proveedor, font="Segoe 11", cursor="hand2")
+button_volver_agregar_prov.grid(column=0, row=0, sticky="NEW", padx=(300,0))
+# boton de mostrar mejor opcion
+button_mostrar_mejor_opcion = tk.Button(frame2_buttons, text="MOSTRAR MEJOR OPCION", fg="white", bg="#2D77D6", activebackground="#266BC3", activeforeground="white", command=mostrar_mejor_opcion, font="Segoe 11", cursor="hand2")
+button_mostrar_mejor_opcion.grid(column=1, row=0, sticky="NEW", padx="20")
+
+raise_frame(f2)
 root.mainloop()

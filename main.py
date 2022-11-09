@@ -374,22 +374,41 @@ frame_lista_proveedores = tk.Frame(frame_lista_container, padx="180", pady="10",
 # frame_lista_proveedores.grid(column=0, row=0, sticky="WES", rowspan=1)
 frame_lista_proveedores.place(x=2,y=2)
 
-def spawn_item_proveedor(col, row):
+def spawn_item_proveedor(col, row, constructora="Constructora SAC", i=0):
+    prov_title = f"Proveedor {i}"
     item_proveedor = tk.Frame(frame_lista_proveedores, padx="2", pady="2", height=80, width=300, bg="white")
     item_proveedor.grid(column=col, row=row, sticky="NEW", padx=8, pady=8)
-    texto_proveedor_n = tk.Label(item_proveedor, text="Proveedor 01", pady="4", font="Segoe 10 bold", bg="white")
+    texto_proveedor_n = tk.Label(item_proveedor, text=prov_title, pady="4", font="Segoe 10 bold", bg="white")
     texto_proveedor_n.place(x=6, y=5)
     texto_prov_nombre = tk.Label(item_proveedor, text="Nombre:", pady="4", font="Segoe 10", fg="#0057C8", bg="white")
     texto_prov_nombre.place(x=6, y=36)
-    texto_prov_nombre = tk.Label(item_proveedor, text="Constructora Las Casaruinas", pady="4", font="Segoe 10", fg="black", bg="white")
+    texto_prov_nombre = tk.Label(item_proveedor, text=constructora, pady="4", font="Segoe 10", fg="black", bg="white")
     texto_prov_nombre.place(x=70, y=36)
 
+    
+n = 1
+col_num = 0
+row_num = 0
 
-spawn_item_proveedor(0,0)
-spawn_item_proveedor(1,0)
-spawn_item_proveedor(0,1)
-spawn_item_proveedor(1,1)
+def get_next_col_row(current_col, current_row):
+    # 0,0 1,0
+    # 0,1 1,1
+    if current_col == 1:
+        current_row += 1
+    current_col = 1 if current_col == 0 else 0
+    return [current_col, current_row]
+    
+def iterate_proveedor_n():
+    global n 
+    n += 1
 
+titles = ["Constructora A", "Constructora B", "Constructora C", "Constructora D", "Constructora E", "Constructora F"]
+for t in titles:
+    print(f"C: {col_num} R: {row_num}")
+    spawn_item_proveedor(col_num,row_num,constructora=t, i=n)
+    n += 1
+    col_num, row_num = get_next_col_row(col_num, row_num)
+      
 frame2_buttons = tk.Frame(f2, padx="200", pady="30", bg="white", height=60, width=1000)
 frame2_buttons.grid(column=0, row=3, sticky="WES")
 # boton de volver a agregar proveedor

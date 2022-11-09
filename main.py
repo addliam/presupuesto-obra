@@ -8,6 +8,24 @@ root.configure(bg="white")
 root.geometry("1000x680")
 root.resizable(width=0, height=0)
 
+# variable global
+presupuestos = []
+proveedores_lista = []
+n = 1
+col_num = 0
+row_num = 0
+# "Constructora A", Subt001, Subt002, Subt003, Total
+minimo_presupuesto = 10e10
+minimo_presupuesto_proveedor_datos = []
+
+def get_next_col_row(current_col, current_row):
+    # 0,0 1,0
+    # 0,1 1,1
+    if current_col == 1:
+        current_row += 1
+    current_col = 1 if current_col == 0 else 0
+    return [current_col, current_row]
+   
 def raise_frame(frame):
     frame.tkraise()
 
@@ -25,50 +43,35 @@ def show_listado_proveedores():
 
     title_proveedores_lista = tk.Label(proveedores_lista, text="LISTADO DE PROVEEDORES", font="Segoe 18 bold" ).grid(column=0, row=0, sticky=('W','E'))
 
-def show_reporte():
+def show_reporte(proveedor, sub1, sub2, sub3, total):
     reporte = tk.Toplevel(root)
-    reporte.title("Reporte de resumen")
+    reporte.title("Mejor opcion")
     reporte.configure(bg="white")
-    reporte.geometry("500x400")
+    reporte.geometry("400x360")
     containerframe = tk.Frame(reporte, padx="40", pady="20")
     containerframe.configure(bg="white")
     containerframe.grid(column=0, row=0, sticky=('NWE'))
 
-    r_texto_usuario = tk.Label(containerframe, text="Usuario: ", font="Segoe 10 bold").grid(column=0, row=0, sticky=('W','E'))
-    r_usuario = tk.Label(containerframe, text="Default usuario")
-    r_usuario.grid(column=1, row=0, sticky=('W','E'))
-    r_texto_obra = tk.Label(containerframe, text="Nombre obra: ", font="Segoe 10 bold").grid(column=0, row=1, sticky=('W','E'))
-    r_obra = tk.Label(containerframe, text="Default nombre obra")
-    r_obra.grid(column=1, row=1, sticky=('W','E'))    
-    r_texto_descripcion = tk.Label(containerframe, text="Descripcion: ", font="Segoe 10 bold").grid(column=0, row=2, sticky=('W','E'))
-    r_descripcion = tk.Label(containerframe, text="Esta es la descripcion de la obra para elaborar el presupuesto")
-    r_descripcion.grid(column=0, row=3, sticky=('W','E'), columnspan=3)
+    r_texto_proveedor = tk.Label(containerframe, text="Proveedor: ", font="Segoe 10 bold").grid(column=0, row=0, sticky=('W','E'))
+    r_proveedor = tk.Label(containerframe, text=proveedor)
+    r_proveedor.grid(column=1, row=0, sticky=('W','E'))
+
     r_subt_fase1 = tk.Label(containerframe, text="Subtotal Fase 1: ", font="Segoe 10 bold").grid(column=0, row=4, sticky=('W','E'))
-    r_subt1 = tk.Label(containerframe, text="Default subtotal1")
+    r_subt1 = tk.Label(containerframe, text=sub1)
     r_subt1.grid(column=0, row=5, sticky=('W','E'), columnspan=2)
     r_subt_fase2 = tk.Label(containerframe, text="Subtotal Fase 2: ", font="Segoe 10 bold").grid(column=0, row=6, sticky=('W','E'))
-    r_subt2 = tk.Label(containerframe, text="Default subtotal2")
+    r_subt2 = tk.Label(containerframe, text=sub2)
     r_subt2.grid(column=0, row=7, sticky=('W','E'), columnspan=2)    
     r_subt_fase3 = tk.Label(containerframe, text="Subtotal Fase 3: ", font="Segoe 10 bold").grid(column=0, row=8, sticky=('W','E'))
-    r_subt3 = tk.Label(containerframe, text="Default subtotal3")
+    r_subt3 = tk.Label(containerframe, text=sub3)
     r_subt3.grid(column=0, row=9, sticky=('W','E'), columnspan=2)
     r_text_total = tk.Label(containerframe, text="Total: ", font="Segoe 10 bold").grid(column=0, row=10, sticky=('W','E'))
-    r_total = tk.Label(containerframe, text="Default total")
+    r_total = tk.Label(containerframe, text=total)
     r_total.grid(column=0, row=11, sticky=('W','E'), columnspan=2)
 
     for child in containerframe.winfo_children():
         child.configure(bg="white")
         child.grid_configure(pady="2")
-
-    # establecer los valores previamente calculados
-    # r_usuario.config(text=nombreusuario.get())
-    # r_obra.config(text=nombreobra.get())
-    # r_descripcion.config(text=descripcion.get())
-
-    r_subt1.config(text=str(float_subtotal_fase1))
-    r_subt2.config(text=str(float_subtotal_fase2))
-    r_subt3.config(text=str(float_subtotal_fase3))
-    r_total.config(text=str(float_total))
 
 def show_error_message():
     messagebox.showwarning("Error de validacion", "Verifica que todos los campos sean entradas validas")
@@ -161,7 +164,53 @@ def volver_agregar_proveedor():
     raise_frame(f1)
 
 def mostrar_mejor_opcion():
-    pass
+    if minimo_presupuesto_proveedor_datos != []:
+        proveedor, subt1, subt2, subt3, p_total = minimo_presupuesto_proveedor_datos
+        show_reporte(proveedor, subt1, subt2, subt3, p_total)
+    else:
+        messagebox.showwarning("Insuficientes datos", "Necesitas agregar datos de proveedores")
+        
+def agregar_presupuesto_a_lista():
+    # solicitar el calculo
+    calcular()
+    global minimo_presupuesto
+    global minimo_presupuesto_proveedor_datos
+    global proveedores_lista
+
+    global col_num
+    global row_num
+    global n
+    textonombreproveedor = nombreproveedor.get()
+    
+    if textonombreproveedor in proveedores_lista:
+        # verificar que el nombre de proveedor no se repita
+        messagebox.showwarning("Error de validacion", "El nombre de proveedor ya ha sido registrado")
+    else:
+        proveedores_lista.append(textonombreproveedor)
+        if textonombreproveedor != "":
+            f_subtotal_f1 = float(subtotal_fase_1.cget("text"))
+            f_subtotal_f2 = float(subtotal_fase_2.cget("text"))
+            f_subtotal_f3 = float(subtotal_fase_3.cget("text"))
+            # resultado en el campo total
+            f_total = float(total.cget("text"))
+
+            # Agregar el item a la lista de proveedores
+            spawn_item_proveedor(col_num,row_num,constructora=textonombreproveedor, i=n)
+            # iterar el numero de proveedor: Proveedor 1,2,3
+            n += 1
+            # iterar la fila y columna
+            col_num, row_num = get_next_col_row(col_num, row_num)
+                      
+            if f_total < minimo_presupuesto:
+                minimo_presupuesto = f_total
+                # "Constructora A", Subt001, Subt002, Subt003, Total
+                proveedor_datos = [textonombreproveedor, f_subtotal_f1, f_subtotal_f2, f_subtotal_f3, f_total]
+                minimo_presupuesto_proveedor_datos = proveedor_datos
+
+            print("-------------------")
+            print(f"Minimo presupuesto data: {minimo_presupuesto_proveedor_datos}")
+        else:
+            show_error_message()
 
 # Frame 1 para la ventana de nombre proveedor, tabla de costos y botones
 f1 = tk.Frame(root)
@@ -337,7 +386,7 @@ for child in contentframe.winfo_children():
 buttonsframe = tk.Frame(f1, padx="100", pady="20", bg="white")
 buttonsframe.grid(column=0, row=2, sticky=('NWE'))
 button_calcular = tk.Button(buttonsframe, text="Calcular", width=24, bg="#2d78d6", fg="white", activebackground="#1f5aa2", activeforeground="white", command=calcular, cursor="hand2").grid(column=0, row=0, sticky=('E'), pady=4, padx=(620,0))
-button_agregar_a_lista = tk.Button(buttonsframe, text="Agregar a lista", width=24, bg="#FF4E4E", fg="white", activebackground="#D34444", activeforeground="white", command=show_reporte, cursor="hand2").grid(column=0, row=1, sticky=('W', 'E'), pady=4, padx=(620,0) )
+button_agregar_a_lista = tk.Button(buttonsframe, text="Agregar a lista", width=24, bg="#FF4E4E", fg="white", activebackground="#D34444", activeforeground="white", command=agregar_presupuesto_a_lista, cursor="hand2").grid(column=0, row=1, sticky=('W', 'E'), pady=4, padx=(620,0) )
 button_limpiar = tk.Button(buttonsframe, text="Limpiar", width=24, bg="#3091e2", fg="white", activebackground="#1f5aa2", activeforeground="white", command=limpiar_campos_entradas, cursor="hand2").grid(column=0, row=2, sticky=('W', 'E'), pady=4, padx=(620,0) )
 
 
@@ -385,30 +434,6 @@ def spawn_item_proveedor(col, row, constructora="Constructora SAC", i=0):
     texto_prov_nombre = tk.Label(item_proveedor, text=constructora, pady="4", font="Segoe 10", fg="black", bg="white")
     texto_prov_nombre.place(x=70, y=36)
 
-    
-n = 1
-col_num = 0
-row_num = 0
-
-def get_next_col_row(current_col, current_row):
-    # 0,0 1,0
-    # 0,1 1,1
-    if current_col == 1:
-        current_row += 1
-    current_col = 1 if current_col == 0 else 0
-    return [current_col, current_row]
-    
-def iterate_proveedor_n():
-    global n 
-    n += 1
-
-titles = ["Constructora A", "Constructora B", "Constructora C", "Constructora D", "Constructora E", "Constructora F"]
-for t in titles:
-    print(f"C: {col_num} R: {row_num}")
-    spawn_item_proveedor(col_num,row_num,constructora=t, i=n)
-    n += 1
-    col_num, row_num = get_next_col_row(col_num, row_num)
-      
 frame2_buttons = tk.Frame(f2, padx="200", pady="30", bg="white", height=60, width=1000)
 frame2_buttons.grid(column=0, row=3, sticky="WES")
 # boton de volver a agregar proveedor
